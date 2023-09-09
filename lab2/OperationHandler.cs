@@ -11,68 +11,141 @@ namespace lab_2
         {
             Dictionary<string, IntegerSet> dict = new Dictionary<string, IntegerSet>() 
             {
-                {"1",  new IntegerSet(new List<int> { 1, 2, 3, 4, 5 }) },
-                {"2",  new IntegerSet(new List<int> { 3, 2, 7, 4, 1 }) }
+                {"1",  new IntegerSet(new List<int> { 0, 0, 0, 0, 0 }) },
+                {"2",  new IntegerSet(new List<int> { 1, 0, 0, 0, 0 }) }
             };
 
             string definiteSet; 
             IEnumerable<int> value;
 
-            var typeOfOperation = Prompt.Select("Выберите тип операции", new[] {"[1] Добавить элемент в множество.", 
-                "[2] Удалить элемент в множестве.", "[3] Объединить множества.", "[4] Сравнить множества.", "[5] Разность множеств."});
+            int programStatus = 1;
 
-            switch (typeOfOperation[1])
+            while (programStatus == 1) 
             {
-                case ('1'):
+                var typeOfOperation = Prompt.Select("Выберите тип операции", new[] { "[1] Добавить элемент в множество.", 
+                                                                                     "[2] Удалить элемент в множестве.", 
+                                                                                     "[3] Объединить множества.", 
+                                                                                     "[4] Сравнить множества.", 
+                                                                                     "[5] Разность множеств.",
+                                                                                     "[6] Выход."
 
-                    definiteSet = Prompt.Select("В какое множество вы хотите добавить элемент?", dict.Keys);
-                    value = Prompt.List<int>($"Введите число, которое хотите добавить в множество №{definiteSet}");
+                                                                                    });
+                switch (typeOfOperation[1])
+                {
+                    case ('1'):
 
-                    dict[definiteSet] = dict[definiteSet] + value.ToArray<int>()[0];
+                        definiteSet = Prompt.Select("В какое множество вы хотите добавить элемент?", dict.Keys);
+                        value = Prompt.List<int>($"Введите число, которое хотите добавить в множество №{definiteSet}");
 
-                    Console.WriteLine("\n==================Добавление элемента прошло успешно!==================\n");
+                        dict[definiteSet] = dict[definiteSet] + value.ToArray<int>()[0];
 
-                    break;
+                        Console.WriteLine("\n==================Добавление элемента прошло успешно!==================\n");
 
-                case ('2'):
+                        break;
 
-                    definiteSet = Prompt.Select("В каком множестве вы хотите удалить элемент?", dict.Keys);
-                    value = Prompt.List<int>($"Введите число, которе хотите удалить в множестве №{definiteSet}");
+                    case ('2'):
 
-                    int previousLength = dict[definiteSet]._HashSet.Count;
+                        definiteSet = Prompt.Select("В каком множестве вы хотите удалить элемент?", dict.Keys);
+                        value = Prompt.List<int>($"Введите число, которе хотите удалить в множестве №{definiteSet}");
 
-                    dict[definiteSet] = dict[definiteSet] - value.ToArray<int>()[0];
+                        int previousLength = dict[definiteSet]._HashSet.Count;
 
-                    if (previousLength == dict[definiteSet]._HashSet.Count)
-                        Console.WriteLine($"\n==================Элемент {value.ToArray<int>()[0]} не находится в множестве!==================\n");
-                    else
-                        Console.WriteLine($"\n==================Удаление элемента прошло успешно!==================\n");
+                        dict[definiteSet] = dict[definiteSet] - value.ToArray<int>()[0];
 
-                    break;
+                        if (previousLength == dict[definiteSet]._HashSet.Count)
+                            Console.WriteLine($"\n==================Элемент {value.ToArray<int>()[0]} не находится в множестве!==================\n");
+                        else
+                            Console.WriteLine($"\n==================Удаление элемента прошло успешно!==================\n");
 
-                case ('3'):
-                    dict["1"] = dict["1"] + dict["2"];
+                        break;
 
-                    Console.WriteLine($"\n==================Объединение множеств прошло успешно!==================\n");
+                    case ('3'):
+                        dict["1"] = dict["1"] + dict["2"];
 
-                    break;
+                        Console.WriteLine($"\n==================Объединение множеств прошло успешно!==================\n");
 
-                case ('4'):
+                        break;
 
-                    break;
+                    case ('4'):
 
-                case ('5'):
+                        definiteSet = Prompt.Select("Какое множество вы хотите сравнивать?", dict.Keys);
+                    
+                        List<string> setsID = new List<string>() { "1", "2" };
 
-                    definiteSet = Prompt.Select("Какое множество будет уменьшаемым?", dict.Keys);
+                        setsID.Remove(definiteSet);
 
-                    if (definiteSet == "1")
-                        dict["1"] = dict["1"] - dict["2"];
-                    else
-                        dict["2"] = dict["2"] - dict["1"];
+                        string operation = Prompt.Select($"Выберите операцию для сравнения с множеством №{setsID[0]}", new List<string>() {"==", "!=", ">=", "<=", ">", "<"});
 
-                    Console.WriteLine($"\n==================Разность множеств прошла успешно!==================\n");
+                        bool isEqually;
 
-                    break;
+                        switch (operation) 
+                        {
+                            case ("=="):
+
+                                isEqually = dict[definiteSet] == dict[setsID[0]];
+                            
+                                Console.WriteLine($"Множество №{definiteSet} == множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+
+                            case ("!="):
+                                isEqually = dict[definiteSet] != dict[setsID[0]];
+
+                                Console.WriteLine($"Множество №{definiteSet} != множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+                            case (">="):
+
+                                isEqually = dict[definiteSet] >= dict[setsID[0]];
+
+                                Console.WriteLine($"Множество №{definiteSet} >= множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+
+                            case ("<="):
+
+                                isEqually = dict[definiteSet] <= dict[setsID[0]];
+
+                                Console.WriteLine($"Множество №{definiteSet} <= множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+                        
+                            case (">"):
+
+                                isEqually = dict[definiteSet] > dict[setsID[0]];
+
+                                Console.WriteLine($"Множество №{definiteSet} > множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+
+                            case ("<"):
+
+                                isEqually = dict[definiteSet] < dict[setsID[0]];
+
+                                Console.WriteLine($"Множество №{definiteSet} < множеству № {setsID[0]}? --> {isEqually}\n");
+
+                                break;
+                        }
+
+                        break;
+
+                    case ('5'):
+
+                        definiteSet = Prompt.Select("Какое множество будет уменьшаемым?", dict.Keys);
+
+                        if (definiteSet == "1")
+                            dict["1"] = dict["1"] - dict["2"];
+                        else
+                            dict["2"] = dict["2"] - dict["1"];
+
+                        Console.WriteLine($"\n==================Разность множеств прошла успешно!==================\n");
+
+                        break;
+
+                    case ('6'):
+                        programStatus = 0;
+                        break;
+                }
             }
         }
     }
