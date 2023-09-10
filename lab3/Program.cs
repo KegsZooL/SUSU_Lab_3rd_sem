@@ -1,5 +1,4 @@
-﻿using System;
-using lab3; // временно
+﻿using lab3;
 
 namespace Program
 {
@@ -7,7 +6,8 @@ namespace Program
     {
         static void Main() 
         {
-
+            OperationHandler operationHandler = new OperationHandler();
+            operationHandler.Menu();
         }
     }
 }
