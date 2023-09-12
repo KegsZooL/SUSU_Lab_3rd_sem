@@ -1,4 +1,5 @@
 ﻿using lab3;
+using System;
 
 namespace Program
 {

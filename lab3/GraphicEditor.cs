@@ -1,31 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using CustomException;
+using System.Threading;
 
 namespace lab3
 {   
     class GraphicEditor
     {
         public Dictionary<string, Figure> Figures { get; }
-        public Dictionary<string, double> AreaFigures { get; private set; }
+
+        public Dictionary<string, int> AreaFigures { get; private set; }
 
         public GraphicEditor() 
         {          
             Figures = new Dictionary<string, Figure>()
             {
-                //{ "Эллипс",        new Ellipse   (_frameThickness: 2.0, 10.0, 5.0)  },
-                //{ "Квадрат",       new Square    (_frameThickness: 5.0, 10.0, 10.0) },
-                //{ "Круг",          new Circle    (_frameThickness: 1.0, 6.0)        },
-                //{ "Прямоугольник", new Rectangle (_frameThickness: 4.0, 10.0, 10.0) },                
-                
-                { "Эллипс",        new Ellipse   (_frameThickness: 2.0, 1000.0, 500.0)  },
-                { "Квадрат",       new Square    (_frameThickness: 5.0, 700.0, 500.0) },
-                { "Круг",          new Circle    (_frameThickness: 1.0, 6000.0)        },
-                { "Прямоугольник", new Rectangle (_frameThickness: 4.0, 10000.0, 10000.0) },
+                { "Эллипс",        new Ellipse   (_frameThickness: 2, 10, 5)  },
+                { "Квадрат",       new Square    (_frameThickness: 5, 15, 15) },
+                { "Круг",          new Circle    (_frameThickness: 1, 2)      },
+                { "Прямоугольник", new Rectangle (_frameThickness: 4, 5, 8)  },
             };
-
             ArrangeAscending();
         }
 
@@ -40,18 +34,14 @@ namespace lab3
         {
             string[] keys = AreaFigures.Keys.ToArray();
 
-            Size sizeConsole = new Size(Console.WindowWidth, Console.WindowHeight);
-            
-            int areaConsoleWindow = sizeConsole.Width * sizeConsole.Height;
+            Console.Clear();
+
+            int countSpace = 0, centerX = Console.WindowWidth / 2, centerY = Console.WindowHeight / 2, startX, startY;
 
             for (int i = keys.Length - 1; i >= 1; i--)
             {
-                try 
+                try
                 {
-                    if (AreaFigures[keys[i]] >= areaConsoleWindow){
-                        throw new GoingBeyondConsoleException($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
-                    }
-
                     switch (keys[i])
                     {
                         case ("Эллипс"):
@@ -61,18 +51,70 @@ namespace lab3
                             break;
 
                         case ("Прямоугольник"):
+
+                            int widthRectangle = Figures[keys[i]].Length;
+                            int heightRectangle = Figures[keys[i]].Length;
+
+                            startX = centerX - widthRectangle / 2;
+                            startY = centerY - heightRectangle / 2;
+
+                            Console.SetCursorPosition(startX, startY);
+
+                            for (int j = 0; j < widthRectangle; j++)
+                            {
+                                for (int q = 0; q < heightRectangle; q++)
+                                {
+                                    if(j == 0 | (j + 1) - widthRectangle == 0 | q == 0 | (q + 1) - heightRectangle == 0) {
+                                        Console.Write("* ");
+                                    }
+                                    else {
+                                        Console.Write("  ");
+                                    }
+                                }
+                                Console.SetCursorPosition(startX, startY + (++countSpace));
+                            }
                             break;
 
                         case ("Квадрат"):
 
+                            int sideOfSquare = Figures[keys[i]].Length;
+
+                            startX = centerX - sideOfSquare / 2;
+                            startY = centerY - sideOfSquare / 2;
+
+                            Console.SetCursorPosition(startX, startY);
+
+                            for (int j = 0; j < sideOfSquare; j++)
+                            {
+                                for (int q = 0; q < sideOfSquare; q++)
+                                {
+                                    if (j == 0 | (j + 1) - sideOfSquare == 0 | q == 0 | (q + 1) - sideOfSquare == 0)
+                                    {
+                                        Console.Write("* ");
+                                    }
+                                    else
+                                    {
+                                        Console.Write("  ");
+                                    }
+                                }
+                                Console.SetCursorPosition(startX, startY + (++countSpace));
+                            }
+
                             break;
                     }
 
+                    Thread.Sleep(500);
+                    Console.Clear();
+
+                    countSpace = 0;
+
                 }
-                catch (GoingBeyondConsoleException ex){
-                    Console.WriteLine(ex.Message);
+                catch(ArgumentOutOfRangeException){
+
+                    Console.Clear();
+                    Console.WriteLine($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
                 }
             }
-        }
+        } 
     }
 }
