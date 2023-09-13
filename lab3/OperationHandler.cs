@@ -10,41 +10,51 @@ namespace lab3
 
         public void Menu() 
         {
-            var typeOfOperation = Prompt.Select("Выберите тип операции", 
-                new[] {
-                        "[1] Упорядочить всю последовательность графических фигур по возрастанию площади.",
-                        "[2] Вывести последние 3-и фигуры без учета толщины рамки.",
+            int programStatus = 1;
 
-                        });
-
-            switch (typeOfOperation[1]) 
+            while (programStatus == 1) 
             {
-                case ('1'):
+                var typeOfOperation = Prompt.Select("Выберите тип операции", 
+                    new[] {
+                            "[1] Упорядочить всю последовательность графических фигур по возрастанию площади.",
+                            "[2] Вывести последние 3-и фигуры без учета толщины рамки.",
+                            "[3] Выход."
 
-                    string[] typesOfFigures = graphicEditor.AreaFigures.Keys.ToArray();
+                            });
 
-                    const int space = -15;
+                switch (typeOfOperation[1]) 
+                {
+                    case ('1'):
 
-                    Console.WriteLine($"  Тип фигуры: {typesOfFigures[0], space}" +
-                                        $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[0]]}\t" +
-                                        $"  Толщина рамки: {graphicEditor.Figures[typesOfFigures[0]].FrameThickness}\t");
+                        string[] typesOfFigures = graphicEditor.AreaFigures.Keys.ToArray();
 
-                    for (int i = 1; i < typesOfFigures.Length; i++)
-                    {
-                        Console.WriteLine($"  Тип фигуры: {typesOfFigures[i], space}" +
-                                            $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[i]]}\t" +
-                                            $"  Толщина рамки: {graphicEditor.Figures[typesOfFigures[i]].FrameThickness}");
-                    }
+                        const int space = -15;
 
-                    Console.WriteLine();
-                    break; 
+                        Console.WriteLine(      $"  Тип фигуры: {typesOfFigures[0], space}" +
+                                                $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[0]]}\t" +
+                                                $"  Толщина рамки: {graphicEditor.Figures[typesOfFigures[0]].FrameThickness}\t"
+                                         );
+
+                        for (int i = 1; i < typesOfFigures.Length; i++)
+                        {
+                            Console.WriteLine(  $"  Тип фигуры: {typesOfFigures[i], space}" +
+                                                $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[i]]}\t" +
+                                                $"  Толщина рамки: {graphicEditor.Figures[typesOfFigures[i]].FrameThickness}"
+                                             );
+                        }
+
+                        Console.WriteLine();
+                        break; 
                     
-                case ('2'):
-                    graphicEditor.OutputLastThreeFigures();
+                    case ('2'):
+                        graphicEditor.OutputLastThreeFigures();
 
-                    break;
-                    
+                        break;
+                    case ('3'):
+                        programStatus = 0;
+                        break;
                 
+                }
             }
         }
     }
