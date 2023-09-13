@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -7,31 +9,31 @@ namespace lab3
 {   
     class GraphicEditor
     {
-        public Dictionary<string, Figure> Figures { get; }
+        public Dictionary<string, Figure> Figures { get; private set; }
 
         public Dictionary<string, int> AreaFigures { get; private set; }
 
-        public GraphicEditor() 
-        {          
-            Figures = new Dictionary<string, Figure>()
-            {
-                { "Круг",          new Circle    (_frameThickness: 5, 7)     },
-                { "Квадрат",       new Square    (_frameThickness: 5, 15, 15) },
-                { "Эллипс",        new Ellipse   (_frameThickness: 2, 7, 12)  },
-                { "Прямоугольник", new Rectangle (_frameThickness: 2, 3,  2)  },
-            };
-            ArrangeAscending();
-        }
+        private int AverageAreaFigure { get; set; }
 
-        private void ArrangeAscending()
+        public void AscendingSort()
         {
             var sortedAreas = Figures.OrderBy(key => key.Value.GetArea()).ThenBy(key => key.Value.GetAreaWithoutFrame()); 
 
             AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea());
+
+            foreach (int area in AreaFigures.Values){
+                AverageAreaFigure += area;
+            }
+
+            AverageAreaFigure /= AreaFigures.Count;
         }
+
+        public int GetAverageAreaFigure() => AverageAreaFigure;
 
         public void OutputLastThreeFigures() 
         {
+            Console.Clear();
+
             string[] keys = AreaFigures.Keys.ToArray();
 
             int consoleWidth = Console.WindowWidth, consoleHeight = Console.WindowHeight;
@@ -45,7 +47,7 @@ namespace lab3
                     {
                         case ("Эллипс"):
 
-                            int radiusX = Figures[keys[i]].Length;
+                            int radiusX = Figures[keys[i]].Width;
                             int radiusY = Figures[keys[i]].Height;
 
                             if(radiusX >= centerX | radiusY >= centerY || radiusY * 2 >= Console.WindowHeight) 
@@ -82,44 +84,25 @@ namespace lab3
 
                         case ("Круг"):
 
-                            //int radius = Figures[keys[i]].Radius;
-
-                            //if(radius >= centerX || radius >= centerY)
-                            //{
-                            //    Console.WriteLine($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
-                            //    break;
-                            //}
-
-                            //double radiusSquared = Math.Pow(radius, 2);
-
-                            //for (int y = 0; y < consoleHeight; y++)
-                            //{
-                            //    for (int x = 0; x < consoleWidth; x++)
-                            //    {
-                            //        double distanceCurrentXFromCenter = Math.Pow(x - centerX, 2);
-                            //        double distanceCurrentYFromCenter = Math.Pow(y - centerY, 2);
-
-                            //        double distance = distanceCurrentXFromCenter + distanceCurrentYFromCenter;
-                                    
-                            //        if(Math.Abs(radiusSquared - distance) < 0.01) {
-                            //            Console.Write("*");
-                            //        }
-                            //        else {
-                            //            Console.Write(" ");
-                            //        }
-                            //    }
-                            //    Console.WriteLine();
-                            //}
-
                             int radius = Figures[keys[i]].Radius;
 
+                            if (radius >= centerX || radius >= centerY)
+                            {
+                                Console.WriteLine($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
+                                break;
+                            }
+
+                            //Параметрический метод(проходимся по всем углам и преобразовываем их в радианы)
                             for (double angle = 0; angle < 360; angle += 1)
                             {
                                 double radians = angle * (Math.PI / 180.0);
+
+                                //Находим координаты точек на окружности 
+
                                 int x = centerX + (int)Math.Round(radius * Math.Cos(radians));
                                 int y = centerY + (int)Math.Round(radius * Math.Sin(radians));
 
-                                if (x >= 0 && x < Console.WindowWidth && y >= 0 && y < Console.WindowHeight)
+                                if (x >= 0  && y >= 0)
                                 {
                                     Console.SetCursorPosition(x, y);
                                     Console.Write("*");
@@ -131,32 +114,32 @@ namespace lab3
 
                         case ("Прямоугольник"):
 
-                            int widthRectangle = Figures[keys[i]].Length;
+                            int widthRectangle = Figures[keys[i]].Width;
                             int heightRectangle = Figures[keys[i]].Height;
 
                             startX = centerX - widthRectangle / 2;
                             startY = centerY - heightRectangle / 2;
 
-                            Console.SetCursorPosition(startX, startY);
-
-                            for (int j = 0; j < widthRectangle; j++)
+                            for (int y = 0; y < heightRectangle; y++)
                             {
-                                for (int q = 0; q < heightRectangle; q++)
+                                Console.SetCursorPosition(startX, startY + y);
+
+                                for (int x = 0; x < widthRectangle; x++)
                                 {
-                                    if(j == 0 | (j + 1) - widthRectangle == 0 | q == 0 | (q + 1) - heightRectangle == 0) {
-                                        Console.Write("* ");
+                                    if (y == 0 || (y + 1) - heightRectangle == 0 || x == 0 || (x + 1) - widthRectangle == 0){
+                                        Console.Write("*");
                                     }
-                                    else {
-                                        Console.Write("  ");
+                                    else{
+                                        Console.Write(" ");
                                     }
                                 }
-                                Console.SetCursorPosition(startX, startY + (++countSpace));
                             }
+
                             break;
 
                         case ("Квадрат"):
 
-                            int sideOfSquare = Figures[keys[i]].Length;
+                            int sideOfSquare = Figures[keys[i]].Width;
 
                             startX = centerX - sideOfSquare / 2;
                             startY = centerY - sideOfSquare / 2;
@@ -189,6 +172,24 @@ namespace lab3
                     Console.WriteLine($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
                 }
             }
-        } 
+        }
+
+        public void Add(Figure figure) 
+        {
+            if (Figures == null)
+                Figures = new Dictionary<string, Figure>();
+
+            Figures.Add(figure.Title, figure);
+        }
+
+        public void ToJson(string fileName)
+        {
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(
+                Figures.Values, Formatting.Indented, new JsonSerializerSettings 
+                    {
+                        TypeNameHandling = TypeNameHandling.All
+                    }
+                ));
+        }
     }
 }

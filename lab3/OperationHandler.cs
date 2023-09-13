@@ -6,10 +6,15 @@ namespace lab3
 {
     class OperationHandler
     {   
-        GraphicEditor graphicEditor = new GraphicEditor();
-
         public void Menu() 
         {
+            GraphicEditor graphicEditor = new GraphicEditor();
+
+            graphicEditor.Add(new Rectangle(3, 10, 5));
+            graphicEditor.Add(new Square(5, 15, 15));
+            graphicEditor.Add(new Ellipse(3, 5, 7));
+            graphicEditor.Add(new Circle(2, 10));
+
             int programStatus = 1;
 
             while (programStatus == 1) 
@@ -18,7 +23,8 @@ namespace lab3
                     new[] {
                             "[1] Упорядочить всю последовательность графических фигур по возрастанию площади.",
                             "[2] Вывести последние 3-и фигуры без учета толщины рамки.",
-                            "[3] Выход."
+                            "[3] Сериализация в JSON файл",
+                            "[4] Выход."
 
                             });
 
@@ -26,16 +32,13 @@ namespace lab3
                 {
                     case ('1'):
 
+                        graphicEditor.AscendingSort();
+
                         string[] typesOfFigures = graphicEditor.AreaFigures.Keys.ToArray();
 
                         const int space = -15;
 
-                        Console.WriteLine(      $"  Тип фигуры: {typesOfFigures[0], space}" +
-                                                $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[0]]}\t" +
-                                                $"  Толщина рамки: {graphicEditor.Figures[typesOfFigures[0]].FrameThickness}\t"
-                                         );
-
-                        for (int i = 1; i < typesOfFigures.Length; i++)
+                        for (int i = 0; i < typesOfFigures.Length; i++)
                         {
                             Console.WriteLine(  $"  Тип фигуры: {typesOfFigures[i], space}" +
                                                 $"  Площадь фигуры: {graphicEditor.AreaFigures[typesOfFigures[i]]}\t" +
@@ -43,15 +46,23 @@ namespace lab3
                                              );
                         }
 
-                        Console.WriteLine();
+                        Console.WriteLine($"  \nСредняя площадь фигуры: {graphicEditor.GetAverageAreaFigure()}\n");
+
                         break; 
                     
                     case ('2'):
                         graphicEditor.OutputLastThreeFigures();
 
                         break;
+                    
                     case ('3'):
+                        graphicEditor.ToJson("C:\\Users\\KegsZooL\\Desktop\\test.txt");
+
+                        break;
+
+                    case ('4'):
                         programStatus = 0;
+
                         break;
                 
                 }
