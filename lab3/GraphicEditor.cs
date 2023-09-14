@@ -21,16 +21,30 @@ namespace lab3
         
         public void AscendingSort()
         {
-            var sortedAreas = Figures.OrderBy(key => key.Value.GetArea()).ThenBy(key => key.Value.GetAreaWithoutFrame()); 
-
-            AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea());
-
-            if(AverageAreaFigure == 0) 
+            try
             {
-                foreach (int area in AreaFigures.Values){
-                    AverageAreaFigure += area;
+                if (listFigures != null && Figures.Count == 0)
+                {
+                    foreach (var figure in listFigures)
+                        Figures.Add(figure.Title, figure);
                 }
-                AverageAreaFigure /= AreaFigures.Count;
+
+                var sortedAreas = Figures.OrderBy(key => key.Value.GetArea()).ThenBy(key => key.Value.GetAreaWithoutFrame());
+
+                AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea());
+
+                if (AverageAreaFigure == 0)
+                {
+                    foreach (int area in AreaFigures.Values)
+                    {
+                        AverageAreaFigure += area;
+                    }
+                    AverageAreaFigure /= AreaFigures.Count;
+                }
+
+            }
+            catch{
+                Console.WriteLine("\n  Список фигур пуст!");
             }
         }
 
@@ -38,6 +52,18 @@ namespace lab3
 
         public void OutputLastThreeFigures() 
         {
+            if (Figures.Count == 0 && listFigures.Count == 0) 
+            {
+                Console.WriteLine("\n  Список фигур пуст!\n");
+                return;
+            }
+
+            if (listFigures != null && Figures.Count == 0)
+            {
+                foreach (var figure in listFigures)
+                    Figures.Add(figure.Title, figure);
+            }
+
             Console.Clear();
 
             string[] keys = AreaFigures.Keys.ToArray();

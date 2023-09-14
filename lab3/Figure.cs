@@ -32,6 +32,7 @@ namespace lab3
 
     }
 
+    // Не стал выносить каждый дочерний класс в отдельный файл, что бы не пришлось качать 4-е доп. файла
     class Square : Figure // Квадрат
     {
         public Square(int frameThickness, int width, int height) : base(frameThickness, width, height){
