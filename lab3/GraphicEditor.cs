@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -9,23 +7,31 @@ namespace lab3
 {   
     class GraphicEditor
     {
-        public Dictionary<string, Figure> Figures { get; private set; }
+        public readonly List<Figure> listFigures = new List<Figure>();
+
+        public static Dictionary<string, Figure> Figures { get; private set; }
 
         public Dictionary<string, int> AreaFigures { get; private set; }
 
         private int AverageAreaFigure { get; set; }
 
+        public GraphicEditor() { }
+
+        static GraphicEditor() => Figures = new Dictionary<string, Figure>();
+        
         public void AscendingSort()
         {
             var sortedAreas = Figures.OrderBy(key => key.Value.GetArea()).ThenBy(key => key.Value.GetAreaWithoutFrame()); 
 
             AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea());
 
-            foreach (int area in AreaFigures.Values){
-                AverageAreaFigure += area;
+            if(AverageAreaFigure == 0) 
+            {
+                foreach (int area in AreaFigures.Values){
+                    AverageAreaFigure += area;
+                }
+                AverageAreaFigure /= AreaFigures.Count;
             }
-
-            AverageAreaFigure /= AreaFigures.Count;
         }
 
         public int GetAverageAreaFigure() => AverageAreaFigure;
@@ -174,22 +180,6 @@ namespace lab3
             }
         }
 
-        public void Add(Figure figure) 
-        {
-            if (Figures == null)
-                Figures = new Dictionary<string, Figure>();
-
-            Figures.Add(figure.Title, figure);
-        }
-
-        public void ToJson(string fileName)
-        {
-            File.WriteAllText(fileName, JsonConvert.SerializeObject(
-                Figures.Values, Formatting.Indented, new JsonSerializerSettings 
-                    {
-                        TypeNameHandling = TypeNameHandling.All
-                    }
-                ));
-        }
+        public void Add(Figure figure) => Figures.Add(figure.Title, figure);
     }
 }
