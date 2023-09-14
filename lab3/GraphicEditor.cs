@@ -7,32 +7,42 @@ namespace lab3
 {   
     class GraphicEditor
     {
+        /* Список фигур с модификатором доступа readonly
+         * для предотвращения изменения списка после инициализации
+        */
         public readonly List<Figure> listFigures = new List<Figure>();
 
+        // Словарь фигур с дочерними объектами класса Figure для сортировки и удобного обращения к ним
         public static Dictionary<string, Figure> Figures { get; private set; }
 
+        // Словарь с площадями фигур 
         public Dictionary<string, int> AreaFigures { get; private set; }
 
+        // Среднее значение площади
         private int AverageAreaFigure { get; set; }
 
         public GraphicEditor() { }
-
+        
+        // Статический конструктор для инициализации единственного экземпляра класса
         static GraphicEditor() => Figures = new Dictionary<string, Figure>();
         
         public void AscendingSort()
         {
             try
-            {
+            {   // Если после десериализации нужно выполнить сортировку 
                 if (listFigures != null && Figures.Count == 0)
                 {
                     foreach (var figure in listFigures)
                         Figures.Add(figure.Title, figure);
                 }
-
+                
+                // Сортируем коллекцию сначала по площади без рамки, а затем по площади с рамкой
                 var sortedAreas = Figures.OrderBy(key => key.Value.GetArea()).ThenBy(key => key.Value.GetAreaWithoutFrame());
 
-                AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea());
+                // Добавляем в коллекцию отсортированные площади фигур
+                AreaFigures = sortedAreas.ToDictionary(key => key.Key, key => key.Value.GetArea()); 
 
+                // Подсчёт средней площади фигуры
                 if (AverageAreaFigure == 0)
                 {
                     foreach (int area in AreaFigures.Values)
@@ -47,17 +57,19 @@ namespace lab3
                 Console.WriteLine("\n  Список фигур пуст!");
             }
         }
-
+        
+        // Вывод средней площади фигуры
         public int GetAverageAreaFigure() => AverageAreaFigure;
 
+        // Вывод в консоль последних 3-x фигур без учёта толщины рамки
         public void OutputLastThreeFigures() 
         {
-            if (Figures.Count == 0 && listFigures.Count == 0) 
+            if (Figures.Count == 0 && listFigures.Count == 0) // Выход из метода, если количестов элементов в списке или коллекции = 0
             {
                 Console.WriteLine("\n  Список фигур пуст!\n");
                 return;
             }
-
+            // Если десериализации нужно выполнить вывод последних 3-x фигур
             if (listFigures != null && Figures.Count == 0)
             {
                 foreach (var figure in listFigures)
@@ -66,12 +78,12 @@ namespace lab3
 
             Console.Clear();
 
-            string[] keys = AreaFigures.Keys.ToArray();
+            string[] keys = Figures.Keys.ToArray(); // массив ключей для обращения к дочерним объектам Figure
 
-            int consoleWidth = Console.WindowWidth, consoleHeight = Console.WindowHeight;
+            int consoleWidth = Console.WindowWidth, consoleHeight = Console.WindowHeight; // Размеры консоли
             int countSpace = 0, centerX = consoleWidth / 2, centerY = consoleHeight / 2, startX, startY;
             
-            for (int i = keys.Length - 1; i >= 1; i--)
+            for (int i = keys.Length - 1; i >= 1; i--) // Обход фигур с конца до предпоследнего
             {
                 try
                 {
@@ -89,8 +101,8 @@ namespace lab3
                             }
 
                             /* Проходимся по всем возможным точкам в консоли
-                             * и вычисляем на сколько далеко данная точка находится от контура эллипса
-                            */
+                             * и вычисляем на сколько далеко данная точка находится от контура эллипса */
+
                             for (int y = 0; y < consoleHeight; y++) 
                             {
                                 for (int x = 0; x < consoleWidth; x++)
@@ -99,7 +111,8 @@ namespace lab3
                                     double distanceCurrentXFromCenter = Math.Pow((x - centerX) / (double)radiusX, 2);
                                     double distanceCurrentYFromCenter = Math.Pow((y - centerY) / (double)radiusY, 2);
 
-                                    double distance = distanceCurrentXFromCenter + distanceCurrentYFromCenter; // Расстояние от текущей точки до центра эллипса
+                                    // Расстояние от текущей точки до центра эллипса
+                                    double distance = distanceCurrentXFromCenter + distanceCurrentYFromCenter;
 
                                     //Если точка приблизительно находится на границе эллипса, то точка является контуром эллипса
 
@@ -149,6 +162,7 @@ namespace lab3
                             int widthRectangle = Figures[keys[i]].Width;
                             int heightRectangle = Figures[keys[i]].Height;
 
+                            // Вычисление начальных координат для отрисовки прямоугольника так, чтобы он был центрирован относительно центра экрана
                             startX = centerX - widthRectangle / 2;
                             startY = centerY - heightRectangle / 2;
 
@@ -158,6 +172,7 @@ namespace lab3
 
                                 for (int x = 0; x < widthRectangle; x++)
                                 {
+                                    // Определение, является ли текущая позиция на грани прямоугольника (звездочка) или внутри (пробел)
                                     if (y == 0 || (y + 1) - heightRectangle == 0 || x == 0 || (x + 1) - widthRectangle == 0){
                                         Console.Write("*");
                                     }
@@ -178,10 +193,11 @@ namespace lab3
 
                             Console.SetCursorPosition(startX, startY);
 
+                            // Анологично с выводом прямоугольника
                             for (int j = 0; j < sideOfSquare; j++)
                             {
                                 for (int q = 0; q < sideOfSquare; q++)
-                                {
+                                {   
                                     if (j == 0 | (j + 1) - sideOfSquare == 0 | q == 0 | (q + 1) - sideOfSquare == 0){
                                         Console.Write("* ");
                                     }
@@ -193,12 +209,12 @@ namespace lab3
                             }
                             break;
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1000); // Задержка перед выводом новой фигуры
                     Console.Clear();
 
                     countSpace = 0;
                 }
-                catch(ArgumentOutOfRangeException){
+                catch(ArgumentOutOfRangeException){ //Обработка исключения для метода Console.SetCursorPosition()
 
                     Console.Clear();
                     Console.WriteLine($"\u001b[31mФигура: {keys[i]} выходит за пределы консоли!\u001b[0m\n");
@@ -206,6 +222,7 @@ namespace lab3
             }
         }
 
-        public void Add(Figure figure) => Figures.Add(figure.Title, figure);
+        // Добавление дочернего объекта Figure в словарь
+        public void Add(Figure figure) => Figures.Add(figure.Title, figure); 
     }
 }
