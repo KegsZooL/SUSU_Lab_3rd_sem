@@ -7,18 +7,17 @@ using System.Collections.Generic;
 
 namespace lab4
 {
-    class ParserHTML    
+    class ParserLinksToPNG    
     {
-        const string URI = "https://www.susu.ru/ru/structure/arhitekturno-stroitelnyy-institut";
-        public void GetLinksToPNG()
+        public void GetLinksToPNG(Uri uri)
         {
             WebClient webClient = new WebClient();
 
             webClient.Headers["User-Agent"] = "Mozila/5.0";
             webClient.Encoding = Encoding.UTF8;
 
-            string page = webClient.DownloadString(new Uri(URI)),
-                URLRegExPattern = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
+            string page = webClient.DownloadString(uri);
+            const string URLRegExPattern = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
             string[] banWords = { "class=", "typeof=", "itemprop=", "align=", "border=" };
 
@@ -72,11 +71,6 @@ namespace lab4
                 }
                 parametrsInTag[i] = string.Join("  ", splitedCurrentLine).Trim();
             }
-
-            //Comparison<string> lengthCompare = (string x, string y) => x.Length.CompareTo(x.Length);
-
-            //parametrsInTag.Sort(lengthCompare);   
-
             OutputHandler.Print(parametrsInTag);
         }
     }

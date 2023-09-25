@@ -1,4 +1,6 @@
 ﻿using lab4;
+using System.Collections.Generic;
+using System;
 
 namespace Program
 {
@@ -6,8 +8,15 @@ namespace Program
     {
         static void Main()
         {
-            ParserHTML parserHTML = new ParserHTML();
-            parserHTML.GetLinksToPNG();
+            ParserLinksToPNG parserhLinks = new ParserLinksToPNG();
+
+            ConsoleOutputHandler consoleOutputHandler = new ConsoleOutputHandler();
+            FileFormationHandler fileFormationHandler = new FileFormationHandler();
+
+            List<IHandler> handlers = new List<IHandler> { consoleOutputHandler, fileFormationHandler };
+            RequestEvent.AddList(handlers);
+
+            RequestEvent.Notify(new Uri("https://www.susu.ru/structure"));
         }
     }
 }
