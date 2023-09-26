@@ -2,7 +2,7 @@
 
 namespace lab4
 {
-    interface IHandler
+    interface IHandler  
     {
         void Process(Uri uri);
     }

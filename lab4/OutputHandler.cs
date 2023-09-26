@@ -7,11 +7,9 @@ namespace lab4
     {
         public static void Print(List<string> parametrs) 
         {
-            string[] currentSplitedLine;
-            string description = "";
+            string[] currentSplitedLine; string description = "";
 
-            int[] withoutDescriptionID = new int[parametrs.Count];
-            int count = 0;
+            int[] withoutDescriptionID = new int[parametrs.Count]; int count = 0;
 
             for (int i = 0; i < parametrs.Count; i++)
             {

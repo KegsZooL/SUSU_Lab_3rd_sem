@@ -8,12 +8,11 @@ namespace Program
     {
         static void Main()
         {
-            ParserLinksToPNG parserhLinks = new ParserLinksToPNG();
-
-            ConsoleOutputHandler consoleOutputHandler = new ConsoleOutputHandler();
+            HrefHandler hrefHandler = new HrefHandler();
             FileFormationHandler fileFormationHandler = new FileFormationHandler();
 
-            List<IHandler> handlers = new List<IHandler> { consoleOutputHandler, fileFormationHandler };
+            List<IHandler> handlers = new List<IHandler> { hrefHandler, fileFormationHandler };
+
             RequestEvent.AddList(handlers);
 
             RequestEvent.Notify(new Uri("https://www.susu.ru/structure"));

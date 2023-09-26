@@ -5,11 +5,9 @@ namespace lab4
 {
     static class RequestEvent
     {
-        public delegate void PNGDelegate(Uri page);
+        delegate void URLHandler(Uri page);
 
-        static event PNGDelegate _SomeEvent;
-
-        public static void Add(PNGDelegate pngDelegate) => _SomeEvent += pngDelegate;
+        static event URLHandler _SomeEvent;
 
         public static void AddList(List<IHandler> handlers) => handlers.ForEach(handler => _SomeEvent += handler.Process);
 

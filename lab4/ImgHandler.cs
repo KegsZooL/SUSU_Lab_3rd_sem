@@ -1,22 +1,17 @@
-﻿using System;
-using System.Net;
+﻿using lab4;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Text;
-using System.Collections.Generic;
 
-namespace lab4
+namespace cyberdemon
 {
-    class ParserLinksToPNG    
+    class ImgHandler : IHandler
     {
-        public void GetLinksToPNG(Uri uri)
+        public void Process(Uri uri)
         {
-            WebClient webClient = new WebClient();
+            string page = Utils.GetPageByURI(uri);
 
-            webClient.Headers["User-Agent"] = "Mozila/5.0";
-            webClient.Encoding = Encoding.UTF8;
-
-            string page = webClient.DownloadString(uri);
             const string URLRegExPattern = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
             string[] banWords = { "class=", "typeof=", "itemprop=", "align=", "border=" };
