@@ -2,7 +2,7 @@
 
 namespace lab4
 {
-    class FileFormationHandler : IHandler
+    class FileFormationHandler 
     {
         public void Process(Uri uri)
         {

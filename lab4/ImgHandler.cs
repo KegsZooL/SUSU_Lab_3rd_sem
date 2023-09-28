@@ -1,22 +1,21 @@
-﻿using lab4;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace cyberdemon
+namespace lab4
 {
     class ImgHandler : IHandler
     {
         public void Process(Uri uri)
         {
+            const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
+            
             string page = Utils.GetPageByURI(uri);
-
-            const string URLRegExPattern = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
             string[] banWords = { "class=", "typeof=", "itemprop=", "align=", "border=" };
 
-            List<string> parametrsInTag = Regex.Matches(page, URLRegExPattern).Cast<Match>().
+            List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
                 Select((key) => key.Value.Replace("<img ", "").Replace(">", "")).ToList();
 
             for (int i = 0; i < parametrsInTag.Count; i++)

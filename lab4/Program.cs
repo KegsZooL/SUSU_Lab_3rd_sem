@@ -8,10 +8,10 @@ namespace Program
     {
         static void Main()
         {
-            HrefHandler hrefHandler = new HrefHandler();
-            FileFormationHandler fileFormationHandler = new FileFormationHandler();
+            HrefHandler hrefHandler = new HrefHandler(maxNumberOfPages: 10);
+            ImgHandler imgHandler = new ImgHandler();
 
-            List<IHandler> handlers = new List<IHandler> { hrefHandler, fileFormationHandler };
+            List<IHandler> handlers = new List<IHandler> { hrefHandler, imgHandler};
 
             RequestEvent.AddList(handlers);
 
