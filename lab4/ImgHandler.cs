@@ -7,16 +7,19 @@ namespace lab4
 {
     class ImgHandler : IHandler
     {
+        const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
+
+        readonly string[] banWords = { "class=", "typeof=", "itemprop=", 
+                                       "align=", "border=", "srcset=" 
+                                     };
         public void Process(Uri uri)
         {
-            const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
-            
             string page = Utils.GetPageByURI(uri);
 
-            string[] banWords = { "class=", "typeof=", "itemprop=", "align=", "border=" };
-
             List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
-                Select((key) => key.Value.Replace("<img ", "").Replace(">", "")).ToList();
+                    Select((key) => key.Value.Replace("<img ", "").Replace(">", "")).ToList();
+
+            Console.WriteLine($"Page: \x1b[31m{uri}\x1b[0m\n");
 
             for (int i = 0; i < parametrsInTag.Count; i++)
             {
@@ -24,8 +27,10 @@ namespace lab4
 
                 for (int j = 0; j < splitedCurrentLine.Count; j++)
                 {
-                    if (splitedCurrentLine[j] == "alt=\"\"")
+                    if (splitedCurrentLine[j] == "alt=\"\"") 
+                    {
                         splitedCurrentLine.Remove(splitedCurrentLine[j]);
+                    }
 
                     if (splitedCurrentLine.Count > 1)
                     {
@@ -54,8 +59,10 @@ namespace lab4
                     {
                         string url = splitedCurrentLine[q];
 
-                        if (splitedCurrentLine[q].StartsWith("/"))
+                        if (splitedCurrentLine[q].StartsWith("/")) 
+                        {
                             splitedCurrentLine[q] = $"https://www.susu.ru/{url}";
+                        }
 
                         else if (splitedCurrentLine[q].StartsWith("https"))
                         {

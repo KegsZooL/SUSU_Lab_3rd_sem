@@ -2,41 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.IO;
 
 namespace lab4
 {
     class HrefHandler : IHandler
     {   
-        readonly HashSet<Uri> passedLinks = new HashSet<Uri>();
-
         int MaxNumberOfPages { get; }
 
+        int Count { get; set; }
+
         string Domain { get; set; }
+
+        readonly HashSet<Uri> passedLinks = new HashSet<Uri>();
+
+        List<string> mainPageLinks;
+
+        const string URL_REG_EX_PATTERN = "a\\s+[^>]*href=\"([^\"]*)\"[^>]*";
+
+        readonly string[] keyWords = { "href=", "title=" };
 
         public HrefHandler(int maxNumberOfPages) => MaxNumberOfPages = maxNumberOfPages;
 
         public void Process(Uri uri)
         {
-            if (passedLinks.Contains(uri))
+            if (passedLinks.Contains(uri) || Count > MaxNumberOfPages) 
+            {
                 return;
+            }
 
-            if (MaxNumberOfPages == 0)
-                return;
-
-            if (passedLinks.Count == 0)
+            if (Domain == null) 
+            {
                 Domain = uri.ToString();
-
-            const string URL_REG_EX_PATTERN = "a\\s+[^>]*href=\"([^\"]*)\"[^>]*";
+            }
 
             string page = Utils.GetPageByURI(uri);
-    
-            string[] keyWords = { "href=", "title="};
 
-            List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
-                Select(key => key.Value).ToList();
-
-            List<string> currentSplitedLine, newLine = new List<string>();  
+            List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>()
+                .Select(key => key.Value).ToList(), currentSplitedLine, newLine = new List<string>();  
             
             for (int i = 0; i < parametrsInTag.Count; i++)
             {
@@ -54,8 +56,10 @@ namespace lab4
                 }
                 parametrsInTag[i] = string.Join(" ", newLine);
 
-                if (parametrsInTag[i].StartsWith("/ru/structure"))
+                if (parametrsInTag[i].StartsWith("/ru/structure")) 
+                { 
                     parametrsInTag[i] = $"{Domain.Replace("/structure", "")}{parametrsInTag[i]}";
+                }
 
                 else if (!parametrsInTag[i].StartsWith("https:")) 
                 {
@@ -64,9 +68,12 @@ namespace lab4
 
                 newLine.Clear();
             }
-            //File.WriteAllLines("C:\\Users\\KegsZooL\\Desktop\\afterHrefs.txt", parametrsInTag);
+            passedLinks.Add(uri);
 
-            //File.WriteAllLines("C:\\Users\\KegsZooL\\Desktop\\beforeHrefs.txt", parametrsInTag);
+            if (mainPageLinks == null)
+                mainPageLinks = parametrsInTag;
+
+            RequestEvent.Notify(new Uri(mainPageLinks[Count++].Split(' ')[0]));            
         }
     }
 }

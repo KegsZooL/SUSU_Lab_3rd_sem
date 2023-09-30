@@ -1,6 +1,6 @@
-﻿using lab4;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
+using lab4;
 
 namespace Program
 {
@@ -8,11 +8,10 @@ namespace Program
     {
         static void Main()
         {
-            HrefHandler hrefHandler = new HrefHandler(maxNumberOfPages: 10);
-            ImgHandler imgHandler = new ImgHandler();
-
-            List<IHandler> handlers = new List<IHandler> { hrefHandler, imgHandler};
-
+            List<IHandler> handlers = new List<IHandler> { new HrefHandler(maxNumberOfPages: 4), 
+                                                           new ImgHandler(),
+                                                           new FileFormationHandler()
+                                                         };
             RequestEvent.AddList(handlers);
 
             RequestEvent.Notify(new Uri("https://www.susu.ru/structure"));
