@@ -21,14 +21,20 @@ namespace lab4
 
         readonly string[] keyWords = { "href=", "title=" };
 
-        public HrefHandler(int maxNumberOfPages) => MaxNumberOfPages = maxNumberOfPages;
+        public HrefHandler(int maxNumberOfPages) 
+        {
+            Count = -1;
+            MaxNumberOfPages = maxNumberOfPages;
+        } 
 
         public void Process(Uri uri)
         {
-            if (passedLinks.Contains(uri) || Count > MaxNumberOfPages) 
+            if (passedLinks.Contains(uri))
             {
                 return;
             }
+
+            passedLinks.Add(uri);
 
             if (Domain == null) 
             {
@@ -68,12 +74,17 @@ namespace lab4
 
                 newLine.Clear();
             }
-            passedLinks.Add(uri);
 
             if (mainPageLinks == null)
                 mainPageLinks = parametrsInTag;
 
-            RequestEvent.Notify(new Uri(mainPageLinks[Count++].Split(' ')[0]));            
+            while(passedLinks.Count <= MaxNumberOfPages - 1) 
+            {   
+                ++Count;
+
+                if (!passedLinks.Contains(new Uri(mainPageLinks[Count])))
+                    RequestEvent.Notify(new Uri(mainPageLinks[Count].Split(' ')[0]));
+            }
         }
     }
 }

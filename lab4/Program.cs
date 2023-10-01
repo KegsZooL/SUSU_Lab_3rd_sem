@@ -8,7 +8,7 @@ namespace Program
     {
         static void Main()
         {
-            List<IHandler> handlers = new List<IHandler> { new HrefHandler(maxNumberOfPages: 4), 
+            List<IHandler> handlers = new List<IHandler> { new HrefHandler(maxNumberOfPages: 3), 
                                                            new ImgHandler(),
                                                            new FileFormationHandler()
                                                          };
