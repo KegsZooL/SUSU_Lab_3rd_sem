@@ -12,7 +12,7 @@ namespace lab4
 
             string[] currentSplitedLine; string description = "";
 
-            int[] withoutDescriptionID = new int[parametrs.Count]; 
+            int[] withoutDescriptionID = new int[parametrs.Count];
             int count = 0, flag = 0;
 
             for (int i = 0; i < parametrs.Count; i++)
@@ -22,14 +22,12 @@ namespace lab4
                 for (int j = 0; j < currentSplitedLine.Length; j++)
                 {
                     if (currentSplitedLine[j].Contains("https"))
-                    {   
-                        if(currentSplitedLine.Length == 1 && !allLinks.Contains(currentSplitedLine[j])) 
+                    {
+                        if (currentSplitedLine.Length == 1 && !allLinks.Contains(currentSplitedLine[j]))
                         {
                             withoutDescriptionID[count++] = i;
-                            
-                            allLinks.Add(currentSplitedLine[j]);
 
-                            flag = 1;
+                            allLinks.Add(currentSplitedLine[j]);
 
                             continue;
                         }
@@ -37,11 +35,6 @@ namespace lab4
                     }
                 }
 
-                if (flag == 1) 
-                {
-                    flag = 0;
-                    continue;
-                }
 
                 for (int q = 0; q < currentSplitedLine.Length; q++)
                 {

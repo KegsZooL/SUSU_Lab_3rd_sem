@@ -9,9 +9,6 @@ namespace lab4
     {
         const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
-        readonly string[] banWords = { "class=", "typeof=", "itemprop=", 
-                                       "align=", "border=", "srcset=" 
-                                     };
         public void Process(Uri uri)
         {
             string page = Utils.GetPageByURI(uri);
@@ -25,53 +22,28 @@ namespace lab4
             {
                 List<string> splitedCurrentLine = parametrsInTag[i].Split(' ').ToList();
 
-                for (int j = 0; j < splitedCurrentLine.Count; j++)
+                string newLine = "";
+
+                if (parametrsInTag[i].StartsWith("alt")) 
                 {
-                    if (splitedCurrentLine[j] == "alt=\"\"") 
+                    newLine += splitedCurrentLine[0];
+
+                    for (int q = 1; q < splitedCurrentLine.Count && splitedCurrentLine.Count >2; q++)
                     {
-                        splitedCurrentLine.Remove(splitedCurrentLine[j]);
-                    }
-
-                    if (splitedCurrentLine.Count > 1)
-                    {
-                        int flag = 0;
-
-                        for (int q = 0; q < banWords.Length; q++)
+                        if (splitedCurrentLine[q].Contains("\"")) 
                         {
-                            if (splitedCurrentLine[j].Contains(banWords[q]))
-                            {
-                                splitedCurrentLine.Remove(splitedCurrentLine[j]);
-                                flag = 1;
-                            }
-
-                            if (splitedCurrentLine[j].Contains("\"") && flag == 1 && !splitedCurrentLine[j].Contains("src="))
-                            {
-                                splitedCurrentLine.Remove(splitedCurrentLine[j]);
-                                flag = 0;
-                                q = -1;
-                            }
+                            newLine += $" {splitedCurrentLine[q]}";
+                            break;
                         }
-                    }
-
-                    splitedCurrentLine[j] = splitedCurrentLine[j].Replace("src=\"", "").Replace("alt=\"", "").Replace("\"", "");
-
-                    for (int q = 0; q < splitedCurrentLine.Count; q++)
-                    {
-                        string url = splitedCurrentLine[q];
-
-                        if (splitedCurrentLine[q].StartsWith("/")) 
-                        {
-                            splitedCurrentLine[q] = $"https://www.susu.ru/{url}";
-                        }
-
-                        else if (splitedCurrentLine[q].StartsWith("https"))
-                        {
-                            splitedCurrentLine[q] = url;
-                        }
+                        newLine += $" {splitedCurrentLine[q]}";
                     }
                 }
-                parametrsInTag[i] = string.Join("  ", splitedCurrentLine).Trim();
+
+                newLine += $" {splitedCurrentLine[splitedCurrentLine.Count - 1]}";
+
+                parametrsInTag[i] = newLine.Replace("alt=", "").Replace("src=", "").Replace("\"", "").Trim(); 
             }
+
             OutputHandler.Print(parametrsInTag);
         }
     }
