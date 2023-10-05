@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace lab4
 {
@@ -9,81 +10,107 @@ namespace lab4
     {   
         int MaxNumberOfPages { get; }
 
-        int Count { get; set; }
+        int MainPageLinksID { get; set; }
+        
+        int MaxDepth { get; set; }
 
-        string currentDomain { get; set; }
+        int CurrentDepth { get; set; }
 
-        readonly HashSet<Uri> passedLinks = new HashSet<Uri>();
-
-        List<string> mainPageLinks;
+        string BaseURI { get; set; }
 
         const string URL_REG_EX_PATTERN = "a\\s+[^>]*href=\"([^\"]*)\"[^>]*";
 
-        readonly string[] keyWords = { "href=", "title=" };
+        List<string> mainPageLinks;
 
-        public HrefHandler(int maxNumberOfPages) 
+        readonly HashSet<Uri> passedLinks = new HashSet<Uri>();
+
+        public HrefHandler(int maxNumberOfPages, int maxDepth) 
         {
-            Count = -1;
+            MainPageLinksID = -1;
+            
             MaxNumberOfPages = maxNumberOfPages;
+            
+            MaxDepth = maxDepth;
         } 
-
-        public void Process(Uri uri)
+        
+        public void Process(Uri uri) 
         {
-            if (passedLinks.Contains(uri))
-            {
+            if (MaxNumberOfPages <= 0)
+            { 
                 return;
             }
 
-            passedLinks.Add(uri);
-
-            if (currentDomain == null) 
+            if(BaseURI == null) 
             {
-                currentDomain = uri.ToString();
+                BaseURI = uri.ToString();
             }
 
-            string page = Utils.GetPageByURI(uri);
-
-            List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>()
-                .Select(key => key.Value).ToList(), currentSplitedLine, newLine = new List<string>();  
+            passedLinks.Add(uri);
             
-            for (int i = 0; i < parametrsInTag.Count; i++)
+            string currentPage = Utils.GetPageByURI(uri);
+
+            List<string> parametrsURI = Regex.Matches(currentPage, URL_REG_EX_PATTERN).Cast<Match>()
+                .Select(key => key.Value).ToList(), currentSplitedLine, newLine = new List<string>();
+
+            File.WriteAllLines("C:\\Users\\KegsZooL\\Desktop\\1.txt", parametrsURI);
+
+            for (int i = 0; i < parametrsURI.Count; i++)
             {
-                currentSplitedLine = parametrsInTag[i].Split(' ').ToList();
+                currentSplitedLine = parametrsURI[i].Split(' ').ToList();
+                
+                int countQuotes = 0, startIndexOfLink = 0, finalIndexOfLink = 0;
 
                 for (int j = 0; j < currentSplitedLine.Count; j++)
-                {
-                    for (int q = 0; q < keyWords.Length; q++)
+                {   
+                    if (currentSplitedLine[j].Contains("href="))
                     {
-                        if (currentSplitedLine[j].Contains(keyWords[q])) 
+                        for (int q = 0; q < currentSplitedLine[j].Length; q++)
                         {
-                            newLine.Add(currentSplitedLine[j].Replace("href=", "").Replace("\"", ""));
+                            if (currentSplitedLine[j][q] == '\"' && countQuotes == 0) 
+                            {   
+                                startIndexOfLink = q + 1;
+                                ++countQuotes;
+                               
+                                continue;
+                            }
+
+                            if (currentSplitedLine[j][q] == '\"' && countQuotes == 1)
+                            {
+                                finalIndexOfLink = q;
+                                parametrsURI[i] = currentSplitedLine[j].Substring(startIndexOfLink, finalIndexOfLink - startIndexOfLink);
+
+                                parametrsURI[i] = parametrsURI[i].StartsWith("/") ? $"{Utils.Domain}{parametrsURI[i]}" : parametrsURI[i];
+
+                                break;
+                            }
                         }
                     }
                 }
-                parametrsInTag[i] = string.Join(" ", newLine);
-
-                if (parametrsInTag[i].StartsWith("/ru/structure")) 
-                { 
-                    parametrsInTag[i] = $"{currentDomain.Replace("/structure", "")}{parametrsInTag[i]}";
-                }
-
-                else if (!parametrsInTag[i].StartsWith("https:")) 
-                {
-                    parametrsInTag[i] = $"{currentDomain.Replace("/structure", "")}{parametrsInTag[i]}";
-                }
-
-                newLine.Clear();
             }
 
             if (mainPageLinks == null)
-                mainPageLinks = parametrsInTag;
+                mainPageLinks = parametrsURI;
 
-            while(passedLinks.Count <= MaxNumberOfPages - 1) 
-            {   
-                ++Count;
+            //File.WriteAllLines("C:\\Users\\KegsZooL\\Desktop\\1.txt", mainPageLinks);
 
-                if (!passedLinks.Contains(new Uri(mainPageLinks[Count])))
-                    RequestEvent.Notify(new Uri(mainPageLinks[Count].Split(' ')[0]));
+            while (passedLinks.Count < MaxNumberOfPages)
+            {
+                ++MainPageLinksID;
+
+                try 
+                {
+                    if (!passedLinks.Contains(new Uri(mainPageLinks[MainPageLinksID])))
+                    {
+                        if (mainPageLinks[MainPageLinksID].StartsWith(BaseURI)) 
+                        {
+                            RequestEvent.Notify(new Uri(mainPageLinks[MainPageLinksID]));
+                        }
+                    }
+                }
+                catch 
+                {
+                    continue;
+                }
             }
         }
     }
