@@ -1,67 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace lab4
 {   
     class OutputHandler
     {   
-        //Код хуйня, нужен рефакторинг 
-        public static void Print(List<string> parametrs) 
+        public static void Print(ref List<string> parametrs) 
         {   
-            HashSet<string> allLinks = new HashSet<string>();
+            HashSet<string> passedLinks = new HashSet<string>();
 
-            string[] currentSplitedLine; string description = "";
+            List<string> currentSplitedLine;
 
-            int[] withoutDescriptionID = new int[parametrs.Count];
-            int count = 0, flag = 0;
+            string description = "";
 
             for (int i = 0; i < parametrs.Count; i++)
             {
-                currentSplitedLine = parametrs[i].Split(' ');
+                currentSplitedLine = parametrs[i].Split(' ').ToList();
 
-                for (int j = 0; j < currentSplitedLine.Length; j++)
+                for (int j = currentSplitedLine.Count - 1; j >= 0; j--)
                 {
-                    if (currentSplitedLine[j].Contains("https"))
+                    int lastIndex = currentSplitedLine.Count - 1;
+                    
+                    string currentUri = ChangeTheURI(currentSplitedLine[lastIndex]);
+
+                    if (!passedLinks.Contains(currentUri)) 
                     {
-                        if (currentSplitedLine.Length == 1 && !allLinks.Contains(currentSplitedLine[j]))
-                        {
-                            withoutDescriptionID[count++] = i;
-
-                            allLinks.Add(currentSplitedLine[j]);
-
-                            continue;
+                        if (currentSplitedLine.Count == 1) 
+                        {   
+                            Console.WriteLine($"Ref: \u001b[36m{currentUri}\u001b[0m\n\t" +
+                                $"Decrtiption: \u001b[33mno\u001b[0m\n");
                         }
-                        allLinks.Add(currentSplitedLine[j]);
-                    }
-                }
-
-
-                for (int q = 0; q < currentSplitedLine.Length; q++)
-                {
-                    if (!currentSplitedLine[q].Contains("https"))
-                    {
-                        if (description.Contains("\n"))
+                        else 
                         {
-                            description = "no";
+                            for (int q = 0; q < lastIndex; q++)
+                            {   
+                                if(q == lastIndex - 1)
+                                    description += $"{currentSplitedLine[q]}";
+                                else
+                                    description += $"{currentSplitedLine[q]} ";
+                            }
+
+                            Console.WriteLine($"Ref: \u001b[36m{currentUri}\u001b[0m\n\t" + 
+                                $"Decrtiption: \u001b[33m{description}\u001b[0m\n");
+
+                            description = "";
                         }
-
-                        description += $"{currentSplitedLine[q]} ";
-                    }
-                    else if (!allLinks.Contains(currentSplitedLine[q]))
-                    {
-                        Console.WriteLine($"Ref: \x1b[36m{currentSplitedLine[q]}\x1b[0m\n\t" +
-                            $"Decrtiption: \x1b[33m{description}\u001b[0m\n");
-
-                        description = "";
-                    }
+                        passedLinks.Add(currentUri);
+                    }   
                 }
             }
+        }
 
-            for (int i = 0; i < count; i++)
+        static string ChangeTheURI(string currentUri)
+        {
+            if (currentUri.StartsWith("/"))
             {
-                Console.WriteLine($"Ref: \u001b[36m{parametrs[withoutDescriptionID[i]]}\u001b[0m\n\t" +
-                    $"Decrtiption: \u001b[33mno\u001b[0m\n");
+                return $"{Utils.Domain}{currentUri}";
             }
+            return currentUri;
         }
     }
 }

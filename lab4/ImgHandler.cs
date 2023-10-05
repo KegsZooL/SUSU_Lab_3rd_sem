@@ -10,7 +10,7 @@ namespace lab4
         const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
         public void Process(Uri uri)
-        {
+        {   
             string page = Utils.GetPageByURI(uri);
 
             List<string> parametrsInTag = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
@@ -44,7 +44,7 @@ namespace lab4
                 parametrsInTag[i] = newLine.Replace("alt=", "").Replace("src=", "").Replace("\"", "").Trim(); 
             }
 
-            OutputHandler.Print(parametrsInTag);
+            OutputHandler.Print(ref parametrsInTag);
         }
     }
 }

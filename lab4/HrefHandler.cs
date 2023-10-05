@@ -11,7 +11,7 @@ namespace lab4
 
         int Count { get; set; }
 
-        string Domain { get; set; }
+        string currentDomain { get; set; }
 
         readonly HashSet<Uri> passedLinks = new HashSet<Uri>();
 
@@ -36,9 +36,9 @@ namespace lab4
 
             passedLinks.Add(uri);
 
-            if (Domain == null) 
+            if (currentDomain == null) 
             {
-                Domain = uri.ToString();
+                currentDomain = uri.ToString();
             }
 
             string page = Utils.GetPageByURI(uri);
@@ -64,12 +64,12 @@ namespace lab4
 
                 if (parametrsInTag[i].StartsWith("/ru/structure")) 
                 { 
-                    parametrsInTag[i] = $"{Domain.Replace("/structure", "")}{parametrsInTag[i]}";
+                    parametrsInTag[i] = $"{currentDomain.Replace("/structure", "")}{parametrsInTag[i]}";
                 }
 
                 else if (!parametrsInTag[i].StartsWith("https:")) 
                 {
-                    parametrsInTag[i] = $"{Domain.Replace("/structure", "")}{parametrsInTag[i]}";
+                    parametrsInTag[i] = $"{currentDomain.Replace("/structure", "")}{parametrsInTag[i]}";
                 }
 
                 newLine.Clear();
