@@ -4,6 +4,6 @@ namespace lab4
 {
     interface IHandler  
     {
-        void Process(Uri uri);
+        void Process(Uri uri, int currentDepth);
     }
 }

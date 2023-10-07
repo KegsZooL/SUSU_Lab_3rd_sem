@@ -4,7 +4,7 @@ namespace lab4
 {
     class FileFormationHandler : IHandler
     {
-        public void Process(Uri uri)
+        public void Process(Uri uri, int currentDepth)
         {
             
         }

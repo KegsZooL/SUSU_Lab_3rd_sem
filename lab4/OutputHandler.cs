@@ -51,7 +51,7 @@ namespace lab4
                 }
             }
         }
-
+        
         static string ChangeTheURI(string currentUri)
         {
             if (currentUri.StartsWith("/"))
