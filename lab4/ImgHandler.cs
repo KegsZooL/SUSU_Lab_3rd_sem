@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.IO;
 
 namespace lab4
 {
@@ -12,18 +11,24 @@ namespace lab4
 
         public void Process(Uri uri, int currentDepth)
         {
+            Console.WriteLine($"Page: \x1b[31m{uri}\x1b[0m\n");
+            
             string page = Utils.GetPageByURI(uri);
 
             List<string> parametrsURI = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
                     Select((key) => key.Value.Replace("<img ", "").Replace(">", "")).ToList();
 
-            Console.WriteLine($"Page: \x1b[31m{uri}\x1b[0m\n");
-
-            File.WriteAllLines("C:\\Users\\KegsZooL\\Desktop\\1.txt", parametrsURI);
-
             for (int i = 0; i < parametrsURI.Count; i++)
             {
                 List<string> splitedCurrentLine = parametrsURI[i].Split(' ').ToList();
+
+                if(splitedCurrentLine.Count == 1 && !splitedCurrentLine[0].Contains(".jpg") && !splitedCurrentLine[0].Contains(".png")) 
+                {
+                    parametrsURI.Remove(parametrsURI[i]);
+
+                    --i;
+                    continue;
+                }
 
                 string newLine = "";
 
@@ -42,7 +47,14 @@ namespace lab4
                     }
                 }
 
-                newLine += $" {splitedCurrentLine[splitedCurrentLine.Count - 1]}";
+                if (splitedCurrentLine[splitedCurrentLine.Count - 1] != "\"")
+                {
+                    newLine += $" {splitedCurrentLine[splitedCurrentLine.Count - 1]}";
+                }
+                else
+                {
+                    newLine += $" {splitedCurrentLine[splitedCurrentLine.Count - 2]}";
+                }
 
                 parametrsURI[i] = newLine.Replace("alt=", "").Replace("src=", "").Replace("\"", "").Trim();
             }

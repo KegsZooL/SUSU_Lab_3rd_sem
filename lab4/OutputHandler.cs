@@ -8,7 +8,7 @@ namespace lab4
     {   
         public static void Print(ref List<string> parametrs) 
         {   
-            HashSet<string> passedLinks = new HashSet<string>();
+            Dictionary<string, string> linksAndDescriptions = new Dictionary<string, string>();
 
             List<string> currentSplitedLine;
 
@@ -22,13 +22,13 @@ namespace lab4
                 {
                     int lastIndex = currentSplitedLine.Count - 1;
                     
-                    string currentUri = ChangeTheURI(currentSplitedLine[lastIndex]);
+                    string currentURI = ChangeTheURI(currentSplitedLine[lastIndex]);
 
-                    if (!passedLinks.Contains(currentUri)) 
+                    if (!linksAndDescriptions.Keys.Contains(currentURI)) 
                     {
                         if (currentSplitedLine.Count == 1) 
                         {   
-                            Console.WriteLine($"Ref: \u001b[36m{currentUri}\u001b[0m\n\t" +
+                            Console.WriteLine($"Ref: \u001b[36m{currentURI}\u001b[0m\n\t" +
                                 $"Decrtiption: \u001b[33mno\u001b[0m\n");
                         }
                         else 
@@ -41,15 +41,17 @@ namespace lab4
                                     description += $"{currentSplitedLine[q]} ";
                             }
 
-                            Console.WriteLine($"Ref: \u001b[36m{currentUri}\u001b[0m\n\t" + 
+                            Console.WriteLine($"Ref: \u001b[36m{currentURI}\u001b[0m\n\t" + 
                                 $"Decrtiption: \u001b[33m{description}\u001b[0m\n");
-
-                            description = "";
                         }
-                        passedLinks.Add(currentUri);
+
+                        linksAndDescriptions.Add(currentURI, description);
+                        description = "";
                     }   
                 }
             }
+            linksAndDescriptions = linksAndDescriptions.OrderByDescending((key) => key.Value.Length).ToDictionary((key) => key.Key, key => key.Value);
+            FileFormationHandler.WriteToExcel(dict: linksAndDescriptions);
         }
         
         static string ChangeTheURI(string currentUri)
