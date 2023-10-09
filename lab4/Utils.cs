@@ -9,7 +9,10 @@ namespace lab4
 {
     static class Utils
     {   
+        //Домен ссылки
         public static string Domain { get; private set; }
+        
+        //Текущая ссылка
         public static string CurrentURI { get; private set; }
 
         public static string GetPageByURI(Uri uri) 
@@ -35,15 +38,17 @@ namespace lab4
             CurrentURI = uri.ToString();
 
             WebClient webClient = new WebClient();
-
+            
+            //Устанавливаю заголовок для HTTP-запроса и кодировку
             webClient.Headers["User-Agent"] = "Mozila/5.0";
             webClient.Encoding = Encoding.UTF8;
 
             return webClient.DownloadString(uri);
         }
 
-        public static List<string> GetParametrsURI(ref string page) 
+        public static List<string> GetAllLinks(ref string page) 
         {
+            //Регулярное выражение для поиска URL-адресов
             const string URL_REG_EX_PATTERN = "a\\s+[^>]*href=\"([^\"]*)\"[^>]*";
 
             List<string> parametrsURI = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>()
@@ -56,7 +61,8 @@ namespace lab4
                 int countQuotes = 0, startIndexOfLink = 0, finalIndexOfLink = 0;
 
                 for (int j = 0; j < currentSplitedLine.Count; j++)
-                {
+                {   
+                    //Извлечение подстроки из тега href=
                     if (currentSplitedLine[j].Contains("href="))
                     {
                         for (int q = 0; q < currentSplitedLine[j].Length; q++)

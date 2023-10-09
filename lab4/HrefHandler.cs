@@ -9,9 +9,15 @@ namespace lab4
 
         int MaxDepth { get; set; }
 
-        string BaseURI { get; set; }
+        string BaseCatalogURI { get; set; }
 
+        //Коллекция пройденных ссылок
         readonly HashSet<string> passedLinks = new HashSet<string>();
+
+        /*
+         * В конструкторе опредяляем для свойств значения максимальное количество странниц
+         * и максимальную вложенность
+        */
 
         public HrefHandler(int maxNumberOfPages, int maxDepth) 
         {   
@@ -21,30 +27,35 @@ namespace lab4
         } 
         
         public void Process(Uri uri, int currentDepth) 
-        {
+        {   
             if (MaxNumberOfPages <= 0)
                 return;
             
-            if(BaseURI == null) 
-                BaseURI = uri.ToString();
+            //Определяем базовый каталог страницы
+            if(BaseCatalogURI == null) 
+                BaseCatalogURI = uri.ToString();
             
+            //Добавляем пройденную страницу в коллекцию
             passedLinks.Add(uri.ToString());
             --MaxNumberOfPages;
             
+            //Получаем html код текущей страницы
             string currentPage = Utils.GetPageByURI(uri);
 
-            List<string> parametrsURI = Utils.GetParametrsURI(ref currentPage);
+            //Получаем все возможные ссылки на страницы
+            List<string> parametrsURI = Utils.GetAllLinks(ref currentPage);
 
             if (parametrsURI[0] == "#main-content")
                 parametrsURI.Remove(parametrsURI[0]);
-            
+
+            //Рекурсия на основе вызова события с проверкой текущей вложенности
             while (passedLinks.Count <= MaxNumberOfPages)
             {
                 try 
                 {
                     foreach (var link in parametrsURI)
-                    {
-                        if (!passedLinks.Contains(link) && (link.ToString().StartsWith(BaseURI) && currentDepth <= MaxDepth))
+                    {   
+                        if (!passedLinks.Contains(link) && (link.ToString().StartsWith(BaseCatalogURI) && currentDepth <= MaxDepth))
                         {
                             RequestEvent.Notify(new Uri(link), currentDepth++);
                         }

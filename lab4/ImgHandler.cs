@@ -7,14 +7,18 @@ namespace lab4
 {
     class ImgHandler : IHandler
     {
+        // Регулярное выражение для поиска тегов <img> и извлечения атрибута src
         const string URL_REG_EX_PATTERN = "<img\\s+[^>]*?src=(\"|')([^\"']+)\\1";
 
         public void Process(Uri uri, int currentDepth)
         {
+            // Выводим URI страницы в консоль
             Console.WriteLine($"Page: \x1b[31m{uri}\x1b[0m\n");
-            
+
+            // Получаем HTML код страницы по указанному URI
             string page = Utils.GetPageByURI(uri);
 
+            // Извлекаем URL-адреса изображений с помощью регулярного выражения
             List<string> parametrsURI = Regex.Matches(page, URL_REG_EX_PATTERN).Cast<Match>().
                     Select((key) => key.Value.Replace("<img ", "").Replace(">", "")).ToList();
 
@@ -22,11 +26,12 @@ namespace lab4
             {
                 List<string> splitedCurrentLine = parametrsURI[i].Split(' ').ToList();
 
+                // Фильтруем некорректные URL-адреса
                 if(splitedCurrentLine.Count == 1 && !splitedCurrentLine[0].Contains(".jpg") && !splitedCurrentLine[0].Contains(".png")) 
                 {
                     parametrsURI.Remove(parametrsURI[i]);
-
                     --i;
+
                     continue;
                 }
 
@@ -55,10 +60,10 @@ namespace lab4
                 {
                     newLine += $" {splitedCurrentLine[splitedCurrentLine.Count - 2]}";
                 }
-
+                // Обрабатываем строки и преобразуем их в корректные URL адреса изображений
                 parametrsURI[i] = newLine.Replace("alt=", "").Replace("src=", "").Replace("\"", "").Trim();
             }
-
+            // Вызываем метод для вывода и обработки найденных URL адресов изображений
             OutputHandler.Print(ref parametrsURI);
         }
     }
