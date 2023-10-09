@@ -23,15 +23,11 @@ namespace lab4
         public void Process(Uri uri, int currentDepth) 
         {
             if (MaxNumberOfPages <= 0)
-            { 
                 return;
-            }
-
+            
             if(BaseURI == null) 
-            {
                 BaseURI = uri.ToString();
-            }
-
+            
             passedLinks.Add(uri.ToString());
             --MaxNumberOfPages;
             
@@ -42,13 +38,13 @@ namespace lab4
             if (parametrsURI[0] == "#main-content")
                 parametrsURI.Remove(parametrsURI[0]);
             
-            while (passedLinks.Count < MaxNumberOfPages)
+            while (passedLinks.Count <= MaxNumberOfPages)
             {
                 try 
                 {
                     foreach (var link in parametrsURI)
                     {
-                        if (!passedLinks.Contains(link) && (link.ToString().StartsWith(BaseURI) && currentDepth < MaxDepth))
+                        if (!passedLinks.Contains(link) && (link.ToString().StartsWith(BaseURI) && currentDepth <= MaxDepth))
                         {
                             RequestEvent.Notify(new Uri(link), currentDepth++);
                         }

@@ -9,7 +9,8 @@ namespace lab4
 {
     static class Utils
     {   
-        public static string Domain { get; set; }
+        public static string Domain { get; private set; }
+        public static string CurrentURI { get; private set; }
 
         public static string GetPageByURI(Uri uri) 
         {
@@ -22,18 +23,16 @@ namespace lab4
                 for (int i = 0; i < currentUri.Length; i++)
                 {
                     if (currentUri[i] == '/') 
-                    {
                         ++countOfSlashes;
-                    }
 
                     if (countOfSlashes == 3) 
-                    {
                         break;
-                    }
 
                     Domain += currentUri[i];
                 }
             }
+
+            CurrentURI = uri.ToString();
 
             WebClient webClient = new WebClient();
 

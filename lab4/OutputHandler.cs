@@ -40,7 +40,6 @@ namespace lab4
                                 else
                                     description += $"{currentSplitedLine[q]} ";
                             }
-
                             Console.WriteLine($"Ref: \u001b[36m{currentURI}\u001b[0m\n\t" + 
                                 $"Decrtiption: \u001b[33m{description}\u001b[0m\n");
                         }
@@ -50,10 +49,11 @@ namespace lab4
                     }   
                 }
             }
+
             linksAndDescriptions = linksAndDescriptions.OrderByDescending((key) => key.Value.Length).ToDictionary((key) => key.Key, key => key.Value);
             FileFormationHandler.WriteToExcel(dict: linksAndDescriptions);
         }
-        
+
         static string ChangeTheURI(string currentUri)
         {
             if (currentUri.StartsWith("/"))

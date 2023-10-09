@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using OfficeOpenXml;
+using OfficeOpenXml.Style.XmlAccess;
 
 namespace lab4
 {
@@ -10,9 +11,12 @@ namespace lab4
         static string path;
 
         static ExcelPackage package;
+       
         static ExcelWorksheet sheet;
 
-        static int row = 2;
+        static ExcelNamedStyleXml styleXml;
+
+        static int row = 1;
 
         public static void WriteToExcel(Dictionary<string, string> dict)
         {
@@ -25,37 +29,45 @@ namespace lab4
                     path = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\MyFile.xlsx";
 
                     package = new ExcelPackage();
+
                     sheet = package.Workbook.Worksheets.Add("firstSheet");
 
-                    sheet.Cells["A1"].Value = "Ссылка";
-                    sheet.Cells["A1"].Style.Font.Bold = true;
-                    sheet.Cells["A1"].Style.Font.Size = 16; 
-                    
-                    sheet.Cells["B1"].Value = "Описание";
-                    sheet.Cells["B1"].Style.Font.Bold = true;
-                    sheet.Cells["B1"].Style.Font.Size = 16;
+                    styleXml = package.Workbook.Styles.CreateNamedStyle("Page");
 
-                    sheet.Column(1).Width = 125;
+                    styleXml.Style.Font.Bold = true;
+                    styleXml.Style.Font.Size = 16;
+                    styleXml.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
+
+                    sheet.Column(1).Width = 155;
                     sheet.Column(2).Width = 55;
+
+                    sheet.Cells["A1"].StyleName = "Page";
 
                     package.SaveAs(new FileInfo(path));
                 }
-                
-                foreach(var value in dict) 
+
+                sheet.Cells["A" + row].StyleName = "Page";
+                sheet.Cells["A" + row].Value = Utils.CurrentURI;
+                sheet.Cells["A" + row++].Hyperlink = new ExcelHyperLink(Utils.CurrentURI);
+
+                sheet.Row(row).OutlineLevel = 0;
+
+                foreach (var value in dict)
                 {
                     sheet.Cells["A" + row].Value = value.Key;
                     sheet.Cells["B" + row].Value = value.Value;
 
+                    sheet.Row(row).OutlineLevel = 1;
+
                     row++;
                 }
-
                 row++;
-
                 package.Save();
             }
-            catch(InvalidOperationException)
+            catch (InvalidOperationException)
             {
                 Console.WriteLine("\t\u001b[31m============Закройте .xlsx файл!============\u001b[0m\n");
+                
                 Environment.Exit(0);
             }
         }

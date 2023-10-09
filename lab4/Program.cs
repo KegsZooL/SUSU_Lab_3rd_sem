@@ -8,13 +8,12 @@ namespace Program
     {
         static void Main()
         {
-            List<IHandler> handlers = new List<IHandler> { new HrefHandler(maxNumberOfPages: 5, maxDepth: 3),
+            List<IHandler> handlers = new List<IHandler> { new HrefHandler(maxNumberOfPages: 2, maxDepth: 3),
                                                            new ImgHandler(),
                                                          };
             RequestEvent.AddList(handlers);
 
             RequestEvent.Notify(new Uri("https://www.susu.ru/ru/structure"), currentDepth: 0);
-
         }
     }
 }
